@@ -1,4 +1,3 @@
-
 public class Customer {
     private String customer_id, name, phone, email, dob;
 
