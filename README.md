@@ -1,2 +1,2 @@
-# Hệ thống quản lý kho cho cửa hàng tạp hóa
+# Ứng dụng đặt vé máy bay
 Bài tập lớn OOP nhóm CAST.
