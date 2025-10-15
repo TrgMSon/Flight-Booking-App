@@ -75,8 +75,6 @@ public class FormCustomer extends Application {
         stage.show();
     }
 
-    // làm popup thông báo khi nhập thông tin không đúng
-
     public void initInform(String message) {
         Stage inform = new Stage();
         inform.setTitle("Thông báo");
