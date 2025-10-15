@@ -15,7 +15,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.control.DatePicker;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
-
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.geometry.Rectangle2D;
