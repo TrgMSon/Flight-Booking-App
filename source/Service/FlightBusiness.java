@@ -1,3 +1,5 @@
+package manage;
+
 import java.sql.Statement;
 // import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -69,4 +71,5 @@ public class FlightBusiness {
         
         return time/60 + " giờ " + time%60 + " phút ";
     }
+
 }
