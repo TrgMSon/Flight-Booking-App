@@ -1,3 +1,5 @@
+package entity;
+
 public class Airport {
     private String airport_id, name, city, country;
 
@@ -43,4 +45,5 @@ public class Airport {
     public void setCountry(String country) {
         this.country = country;
     }
+
 }
