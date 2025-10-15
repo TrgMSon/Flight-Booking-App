@@ -15,6 +15,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.control.DatePicker;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
+
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.geometry.Rectangle2D;
 import javafx.event.ActionEvent;
@@ -68,9 +70,31 @@ public class FormCustomer extends Application {
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight() - 20);
+        scene.getStylesheets().add(getClass().getResource("/effect/style.css").toExternalForm());
         stage.setTitle("Nhập thông tin khách hàng");
         stage.setScene(scene);
         stage.show();
+    }
+
+    // làm popup thông báo khi nhập thông tin không đúng
+
+    public void initInform(String message) {
+        Stage inform = new Stage();
+        inform.setTitle("Thông báo");
+        inform.initModality(Modality.APPLICATION_MODAL);
+        
+        BorderPane root = new BorderPane();
+        VBox informBox = new VBox(20);
+        Label informLabel = new Label(message);
+        Button close = new Button("Đóng");
+        initActionClose(close, inform);
+        informBox.setAlignment(Pos.CENTER);
+        informBox.getChildren().addAll(informLabel, close);
+        
+        root.setCenter(informBox);
+        Scene scene = new Scene(root, 300, 200);
+        inform.setScene(scene);
+        inform.show();
     }
 
     public void initActionAccept(Button accept, Stage stage, VBox form) {
@@ -100,7 +124,13 @@ public class FormCustomer extends Application {
                 }
                 
                 Customer customer = new Customer(customer_id, name, dob, phone, mail);
-                CustomerBusiness.addCustomer(customer);
+                if (CustomerBusiness.isValid(customer)) {
+                    CustomerBusiness.addCustomer(customer);
+                }
+                else {
+                    initInform("Vui lòng nhập đủ thông tin khách hàng");
+                    return;
+                }
 
                 stage.close();
             }
