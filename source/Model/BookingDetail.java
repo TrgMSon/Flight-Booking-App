@@ -1,3 +1,5 @@
+package entity;
+
 public class BookingDetail {
     private String flight_id, booking_id, customer_id, flight_number;
     private int passengers;
@@ -54,4 +56,5 @@ public class BookingDetail {
     public void setPassengers(int passengers) {
         this.passengers = passengers;
     }
+
 }
