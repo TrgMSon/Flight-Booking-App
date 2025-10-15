@@ -1,3 +1,5 @@
+package entity;
+
 import java.math.BigDecimal;
 
 public class Booking {
@@ -47,3 +49,4 @@ public class Booking {
         this.total_amount = total_amount;
     }
 }
+
