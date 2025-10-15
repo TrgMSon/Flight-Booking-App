@@ -1,3 +1,5 @@
+package entity;
+
 import java.math.BigDecimal;
 
 public class FlightTicket {
@@ -38,4 +40,5 @@ public class FlightTicket {
     public void setSeatAvailable(int seats_available) {
         this.seats_available = seats_available;
     }
+
 }
