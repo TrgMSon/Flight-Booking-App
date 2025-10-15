@@ -1,3 +1,5 @@
+package entity;
+
 public class Customer {
     private String customer_id, name, phone, email, dob;
 
@@ -52,4 +54,5 @@ public class Customer {
     public void setEmail(String email) {
         this.email = email;
     }
+
 }
