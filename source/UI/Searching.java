@@ -6,8 +6,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
-
 import java.util.Objects;
+
 public class Searching extends Application {
 
     @Override
@@ -32,4 +32,5 @@ public class Searching extends Application {
         launch();
     }
 }
+
 
