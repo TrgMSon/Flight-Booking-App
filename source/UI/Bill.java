@@ -1,4 +1,5 @@
 package UI;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -8,6 +9,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import manage.AirPortBusiness;
 import manage.BookingBusiness;
 import manage.BookingDetailBusiness;
 import manage.CustomerBusiness;
@@ -17,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.BorderPane;
 import java.util.ArrayList;
+import entity.Airport;
 import entity.Booking;
 import entity.BookingDetail;
 import entity.Customer;
@@ -27,35 +30,49 @@ import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 
 public class Bill extends Application {
+    private String customer_id;
+    private int qty_bookings;
+
+    public void setCustomerId(String customer_id) {
+        this.customer_id = customer_id;
+    }
+
     public void start(Stage stage) {
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(20, 10, 10, 10));
 
-        String customer_id = "C0001";
         VBox customerInfor = initInforCustomer(customer_id);
         VBox bill = initBill(customer_id);
 
-        StackPane wrapper = new StackPane(bill);
-        wrapper.setAlignment(Pos.CENTER);
+        if (qty_bookings > 0) {
+            StackPane wrapper = new StackPane(bill);
+            wrapper.setAlignment(Pos.CENTER);
 
-        ScrollPane scrollPane = new ScrollPane(wrapper);
-        scrollPane.setPadding(new Insets(5, 5, 20, 5));
-        scrollPane.setFitToWidth(true);
-        scrollPane.setPannable(true);
+            ScrollPane scrollPane = new ScrollPane(wrapper);
+            scrollPane.setPadding(new Insets(5, 5, 20, 5));
+            scrollPane.setFitToWidth(true);
+            scrollPane.setPannable(true);
 
-        HBox buttonBox = new HBox();
-        Button close = new Button("Đóng");
-        close.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-                stage.close();
-            }
-        });
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().add(close);
+            HBox buttonBox = new HBox();
+            Button close = new Button("Đóng");
+            close.setOnAction(new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    stage.close();
+                }
+            });
+            buttonBox.setAlignment(Pos.CENTER);
+            buttonBox.getChildren().add(close);
 
-        root.setTop(customerInfor);
-        root.setCenter(scrollPane);
-        root.setBottom(buttonBox);
+            root.setTop(customerInfor);
+            root.setCenter(scrollPane);
+            root.setBottom(buttonBox);
+        }
+
+        else {
+            Label message = new Label("Hiện tại bạn chưa thực hiện lần đặt vé nào");
+            root.setTop(customerInfor);
+            root.setCenter(message);
+        }
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         Scene scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight() - 20);
@@ -89,17 +106,21 @@ public class Bill extends Application {
         bill.setAlignment(Pos.CENTER);
 
         ArrayList<Booking> bookings = BookingBusiness.showListBooking(customer_id);
+        qty_bookings = bookings.size();
         for (Booking booking : bookings) {
             VBox bookingRow = initBookingRow(booking);
+            bookingRow.getStyleClass().add("vbox-bookingRow");
             bookingRow.setAlignment(Pos.CENTER);
 
             String total_amount = String.valueOf(booking.getTotalAmount());
             ArrayList<BookingDetail> bookingDetails = BookingDetailBusiness
                     .showListBookingDetail(booking.getBookingId());
             for (BookingDetail bookingDetail : bookingDetails) {
+                HBox addressInfor = addingAddress(FlightBusiness.showFlight(bookingDetail.getFlightId()));
+                addressInfor.getStyleClass().add("hbox-address");
                 HBox flightRow = createRow(FlightBusiness.showFlight(bookingDetail.getFlightId()),
                         bookingDetail.getPassengers());
-                bookingRow.getChildren().add(flightRow);
+                bookingRow.getChildren().addAll(addressInfor, flightRow);
             }
 
             HBox totalBox = new HBox(20);
@@ -107,6 +128,7 @@ public class Bill extends Application {
             Label totalLabel = new Label();
             totalLabel.setMinWidth(500);
             Label total = new Label("Tổng tiền: " + BookingBusiness.normalizeTotal(total_amount) + " VND");
+            total.getStyleClass().add("label-total");
             totalBox.getChildren().addAll(totalLabel, total);
 
             bookingRow.getChildren().add(totalBox);
@@ -123,6 +145,24 @@ public class Bill extends Application {
         return bookingRow;
     }
 
+    public HBox addingAddress(Flight flight) {
+        HBox addressBox = new HBox(20);
+        addressBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label joiner = new Label();
+        joiner.setMinWidth(280);
+
+        Airport airport = AirPortBusiness.showInfor(flight.getDepartureAirportId());
+        Label dpt_address = new Label(airport.getCity());
+
+        airport = AirPortBusiness.showInfor(flight.getArrivalAirportId());
+        Label arv_address = new Label(airport.getCity());
+
+        Label tmp = new Label("đến");
+        addressBox.getChildren().addAll(joiner, dpt_address, tmp, arv_address);
+        return addressBox;
+    }
+
     public HBox createRow(Flight flight, int passengers) {
         HBox flightRow = new HBox(40);
         flightRow.setPadding(new Insets(20, 40, 20, 40));
@@ -136,7 +176,7 @@ public class Bill extends Application {
 
         VBox joinerBox = new VBox(20);
         joinerBox.setAlignment(Pos.CENTER);
-        Label joiner = new Label("-----------");
+        Label joiner = new Label("-------------------->");
         joinerBox.getChildren().add(joiner);
 
         VBox arv_infor = new VBox(20);
@@ -154,7 +194,8 @@ public class Bill extends Application {
         flightDurationBox.getChildren().addAll(flightDurationLabel, flightInfor);
 
         VBox costBox = new VBox(20);
-        Label cost = new Label(BookingBusiness.normalizeTotal(FlightTicketBusiness.getPrice(flight.getFlightId())) + " VND (mỗi hành khách)");
+        Label cost = new Label(BookingBusiness.normalizeTotal(FlightTicketBusiness.getPrice(flight.getFlightId()))
+                + " VND (mỗi hành khách)");
         cost.setMinWidth(300);
         Label qty_passenger = new Label("Số lượng hành khách: " + passengers);
         qty_passenger.setMinWidth(300);
