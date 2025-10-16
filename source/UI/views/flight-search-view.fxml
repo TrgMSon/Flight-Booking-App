@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="200" prefWidth="881.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.FlightSearchController">
+
+    <!-- Departure and Destination -->
+    <ComboBox fx:id="departurePicker" layoutX="20" layoutY="50" prefWidth="150" />
+    <ComboBox fx:id="destinationPicker" layoutX="250" layoutY="50" prefWidth="150" />
+
+
+    <Label layoutX="20" layoutY="25" text="Từ" />
+    <Label layoutX="250" layoutY="25" text="Đến" />
+
+    <!-- Dates -->
+    <DatePicker fx:id="departureDate" layoutX="463.0" layoutY="50.0" promptText="Ngày đi" />
+    <DatePicker fx:id="returnDate" layoutX="691.0" layoutY="50.0" promptText="Ngày về" />
+
+    <!-- Buttons -->
+    <Button fx:id="recentSearchButton" layoutX="20.0" layoutY="143.0" onAction="#handleRecentSearch" text="Tra cứu gần đây" />
+
+    <Button fx:id="searchButton" layoutX="801.0" layoutY="143.0" onAction="#handleSearch" text="Tìm kiếm" />
+</AnchorPane>
