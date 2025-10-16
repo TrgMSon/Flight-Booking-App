@@ -18,7 +18,7 @@ public class Searching extends Application {
         Scene scene = new Scene(root);
         Image icon = new Image(Objects.requireNonNull(getClass().getResource("/UI/resources/search_icon.png")).toExternalForm());
 
-        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/effect/style.css")).toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/effect/style.css").toExternalForm());
         stage.getIcons().add(icon);
 
 
@@ -32,3 +32,4 @@ public class Searching extends Application {
         launch();
     }
 }
+
