@@ -1,10 +1,10 @@
-/* JavaFX CSS only — ignore web CSS warnings */
+/* JavaFX CSS only */
 
 .button {
     -fx-background-color: rgba(255, 255, 0, 0.501);
     -fx-pref-width: 200;
     -fx-pref-height: 50;
-    -fx-font-size: 20;
+    -fx-font-size: 16;
     -fx-border-color: rgba(165, 42, 42, 0.41);
     -fx-border-radius: 10;
     -fx-background-insets: 2;
@@ -24,6 +24,170 @@
 }
 
 .label-total {
+    -fx-font-size: 18;
+}
+
+.scroll-pane {
+    -fx-border-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
+
+.hbox-address {
+    -fx-font-weight: bold;
+}
+
+.vbox-bookingRow {
+    -fx-border-radius: 10;
+    -fx-border-color: rgba(0, 0, 0, 0.684);
+}
+
+/* Styles specific to the search button */
+.searchButton {
+    -fx-background-color: #E6B441;
+    -fx-pref-width: 100;
+    -fx-pref-height: 40;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-border-color: #E6B441;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
     -fx-font-size: 16;
 }
 
+/* Hover state — remove the space after ':' */
+.searchButton:hover {
+    -fx-background-color: white;
+}
+
+/* Styles specific to the recent search button */
+.recentSearchButton {
+    -fx-background-color: #E6B441;
+    -fx-pref-width: 150;
+    -fx-pref-height: 40;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-border-color: #E6B441;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 16;
+}
+
+/* Hover state — remove the space after ':' */
+.recentSearchButton:hover {
+    -fx-background-color: white;
+}
+
+.bookingHistoryButton {
+    -fx-background-color: #E6B441;
+    -fx-pref-width: 150;
+    -fx-pref-height: 40;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-border-color: #E6B441;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 16;
+}
+
+.bookingHistoryButton:hover {
+    -fx-background-color: white;
+}
+
+.flightSearchWindow {
+    -fx-background-color: #F9F6EF;
+}
+/* === Calendar Popup Base === */
+.date-picker-popup {
+    -fx-background-color: white;
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 2);
+    -fx-font-family: "Segoe UI", "Roboto", sans-serif;
+}
+
+/* === Month and Year Header === */
+.date-picker-popup > .month-year-pane {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #dddddd transparent;
+    -fx-padding: 6;
+}
+
+.date-picker-popup > .month-year-pane .label {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-font-size: 14;
+}
+
+/* === Navigation Arrows === */
+.date-picker-popup > .month-year-pane .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #007A8C;
+    -fx-cursor: hand;
+}
+
+.date-picker-popup > .month-year-pane .button:hover {
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 5;
+}
+
+/* === Day Cell Grid === */
+.date-picker-popup .day-cell {
+    -fx-background-color: white;
+    -fx-text-fill: #333333;
+    -fx-font-size: 13;
+    -fx-alignment: center;
+    -fx-pref-width: 36;
+    -fx-pref-height: 32;
+    -fx-border-color: transparent;
+}
+
+.date-picker-popup .day-cell:hover {
+    -fx-background-color: #FFF7E0;  /* light gold hover */
+    -fx-cursor: hand;
+}
+
+/* === Selected Day === */
+.date-picker-popup .day-cell:selected {
+    -fx-background-color: #E6B441;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* === Today (current date) === */
+.date-picker-popup .day-cell.today {
+    -fx-border-color: #007A8C;
+    -fx-border-width: 2;
+    -fx-border-radius: 4;
+}
+
+
+/* Make the month and year navigation arrows smaller */
+.date-picker-popup .spinner .button {
+    -fx-min-width: 16;
+    -fx-min-height: 16;
+    -fx-pref-width: 16;
+    -fx-pref-height: 16;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+/* Adjust the arrow icons (the triangles) inside those buttons */
+.date-picker-popup .spinner .button .arrow {
+    -fx-scale-x: 0.6;  /* make narrower */
+    -fx-scale-y: 0.6;  /* make shorter */
+    -fx-background-color: #E6B441;  /* your gold color */
+}
+
+/* Optional hover effect for the arrow buttons */
+.date-picker-popup .spinner .button:hover .arrow {
+    -fx-background-color: #c99935;
+}
+
+/* Optional: make the top header more compact */
+.date-picker-popup .month-year-pane {
+    -fx-padding: 4 8 4 8;  /* shrink vertical padding */
+    -fx-alignment: center;
+}
