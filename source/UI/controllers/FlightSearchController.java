@@ -15,6 +15,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import entity.FlightSearch;
 import Connection.DataConnection;
+import UI.ChooseFlight;
 import UI.FormCustomer;
 import UI.Mode.Mode;
 
@@ -23,10 +24,12 @@ public class FlightSearchController {
     public Button recentSearchButton;
     public Button bookingHistoryButton;
     public AnchorPane flightSearchWindow;
+    private int count = 1;
     @FXML private ComboBox<String> departurePicker;
     @FXML private ComboBox<String> destinationPicker;
     @FXML private DatePicker departureDate;
     @FXML private DatePicker returnDate;
+    @FXML private Label passengers;
     static private ObservableList<FlightSearch> recentSearches = FXCollections.observableArrayList();
 
     @FXML
@@ -153,12 +156,21 @@ public class FlightSearchController {
             return;
         }
 
-        FlightSearch flightSearch = new FlightSearch(departure, destination, depDate, retDate);
+        int passenger = Integer.parseInt(passengers.getText());
+
+        FlightSearch flightSearch = new FlightSearch(departure, destination, depDate, retDate, passenger);
         if (!recentSearches.contains(flightSearch)) {
             recentSearches.add(flightSearch);
         }
+
+        ChooseFlight chooseFlight = new ChooseFlight();
+        chooseFlight.setFlightSearch(flightSearch);
+        Stage stage = new Stage();
+        chooseFlight.start(stage);
+
         System.out.println("Searching flights from " + departure + " to " + destination +
-                " departing on " + depDate + " and returning on " + retDate);
+                " departing on " + depDate + " and returning on " + retDate + " passengers " + passenger);
+
     }
 
     public void handleRecentSearch() {
@@ -180,5 +192,21 @@ public class FlightSearchController {
         Stage stage = new Stage();
         formCustomer.setMode(Mode.SHOW);
         formCustomer.start(stage);
+    }
+
+    @FXML
+    private void handlePlus() {
+        if (count < 9) {
+            count++;
+        }
+        passengers.setText(String.valueOf(count));
+    }
+
+    @FXML
+    private void handleMinus() {
+        if (count > 1) {
+            count--;
+        }
+        passengers.setText(String.valueOf(count));
     }
 }
