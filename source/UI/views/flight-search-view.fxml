@@ -6,20 +6,25 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 
-<AnchorPane fx:id="flightSearchWindow" prefHeight="265.0" prefWidth="881.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.FlightSearchController">
+<AnchorPane fx:id="flightSearchWindow" prefHeight="265.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.FlightSearchController">
 
     <!-- Departure and Destination -->
-    <ComboBox fx:id="departurePicker" layoutX="20.0" layoutY="107.0" prefHeight="26.0" prefWidth="175.0" />
-    <ComboBox fx:id="destinationPicker" layoutX="250.0" layoutY="107.0" prefHeight="26.0" prefWidth="175.0" />
+    <ComboBox fx:id="departurePicker" layoutX="20.0" layoutY="107.0" prefHeight="26.0" prefWidth="210.0" />
+    <ComboBox fx:id="destinationPicker" layoutX="250.0" layoutY="107.0" prefHeight="26.0" prefWidth="210.0" />
 
 
     <Label layoutX="20.0" layoutY="80.0" text="Từ" />
     <Label layoutX="250.0" layoutY="80.0" text="Đến" />
+    <Label layoutX="472.0" layoutY="80.0" text="Ngày đi" />
+    <Label layoutX="690.0" layoutY="80.0" text="Ngày về" />
+    
 
     <!-- Dates -->
-    <DatePicker fx:id="departureDate" layoutX="472.0" layoutY="107.0" promptText="Ngày đi" />
-    <DatePicker fx:id="returnDate" layoutX="691.0" layoutY="107.0" promptText="Ngày về" />
+    <DatePicker fx:id="departureDate" layoutX="472.0" layoutY="107.0" />
+    <DatePicker fx:id="returnDate" layoutX="691.0" layoutY="107.0" />
 
     <!-- Buttons -->
     <Button fx:id="recentSearchButton" layoutX="14.0" layoutY="14.0" onAction="#handleRecentSearch" text="Tra cứu gần đây">
@@ -27,7 +32,7 @@
          <Font name="System Bold" size="10.0" />
       </font></Button>
 
-    <Button fx:id="searchButton" layoutX="769.0" layoutY="208.0" onAction="#handleSearch" text="Tìm kiếm">
+    <Button fx:id="searchButton" layoutX="730.0" layoutY="208.0" onAction="#handleSearch" text="Tìm kiếm">
       <font>
          <Font name="System Bold" size="10.0" />
       </font></Button>
@@ -36,4 +41,13 @@
       <font>
          <Font name="System Bold" size="10.0" />
       </font></Button>
+
+    <VBox alignment="CENTER" spacing="10" layoutX="40" layoutY="180">
+        <Label layoutX="50" layoutY="200" text="Hành khách" />
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="-" styleClass="circle-button" onAction="#handleMinus"/>
+            <Label fx:id="passengers" text="1" style="-fx-font-size: 24px;"/>
+            <Button text="+" styleClass="circle-button" onAction="#handlePlus"/>
+        </HBox>
+    </VBox>
 </AnchorPane>
