@@ -5,42 +5,79 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import java.io.IOException;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
+import java.io.IOException;
+
 import entity.FlightSearch;
 import Connection.DataConnection;
-import UI.ChooseFlight;
 import UI.FormCustomer;
 import UI.Mode.Mode;
+import UI.Searching;
 
 public class FlightSearchController {
     public Button searchButton;
     public Button recentSearchButton;
     public Button bookingHistoryButton;
-    public AnchorPane flightSearchWindow;
+    private Stage searchingStage;
     private int count = 1;
+    private Mode mode = Mode.ROUNDTRIP;
     @FXML private ComboBox<String> departurePicker;
     @FXML private ComboBox<String> destinationPicker;
     @FXML private DatePicker departureDate;
     @FXML private DatePicker returnDate;
-    @FXML private Label passengers;
+    @FXML private Label passengers, lbDepartureDate, lbReturnDate;
+    @FXML private RadioButton oneWayOpt, roundTripOpt;
     static private ObservableList<FlightSearch> recentSearches = FXCollections.observableArrayList();
 
+    public void setSearchingStage(Stage searchingStage) {
+        this.searchingStage = searchingStage;
+    }
+
     @FXML
-    private void initializeForLocation(){
+    private void handleOneWayOpt() {
+        if (oneWayOpt.isSelected()) {
+            mode = Mode.ONEWAY;
+            roundTripOpt.setSelected(false);
+            returnDate.setVisible(false);
+            lbReturnDate.setVisible(false);
+            departureDate.setVisible(true);
+            lbDepartureDate.setVisible(true);
+        } else {
+            oneWayOpt.setSelected(true);
+        }
+    }
+
+    @FXML
+    private void handleRoundTripOpt() {
+        if (roundTripOpt.isSelected()) {
+            mode = Mode.ROUNDTRIP;
+            oneWayOpt.setSelected(false);
+            departureDate.setVisible(true);
+            lbDepartureDate.setVisible(true);
+            returnDate.setVisible(true);
+            lbReturnDate.setVisible(true);
+        } else {
+            roundTripOpt.setSelected(true);
+        }
+    }
+
+    @FXML
+    private void initializeForLocation() {
 
         ObservableList<String> locations = FXCollections.observableArrayList();
         String query = "SELECT city, airport_id, country FROM airport";
 
         try (Connection conn = DataConnection.setConnect();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 String city = rs.getString("city");
@@ -65,6 +102,7 @@ public class FlightSearchController {
 
     @FXML
     public void initialize() {
+        setSearchingStage(Searching.getSearchingStage());
         initializeForLocation();
         departureDate.setDayCellFactory(picker -> new DateCell() {
             @Override
@@ -128,7 +166,7 @@ public class FlightSearchController {
             return;
         }
 
-        if (retDate.equals("N/A")) {
+        if (retDate.equals("N/A") && mode == Mode.ROUNDTRIP) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Cảnh báo");
             alert.setHeaderText(null);
@@ -137,7 +175,7 @@ public class FlightSearchController {
             return;
         }
 
-        if (depDate.compareTo(retDate) > 0) {
+        if (depDate.compareTo(retDate) > 0 && mode == Mode.ROUNDTRIP) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Cảnh báo");
             alert.setHeaderText(null);
@@ -146,12 +184,11 @@ public class FlightSearchController {
             return;
         }
 
-
         if (departure.equals(destination)) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Cảnh báo");
             alert.setHeaderText(null);
-            alert.setContentText("Thành phố khởi hành và điểm đến không thể giống nhau.");
+            alert.setContentText("Điểm đi và điểm đến không thể giống nhau.");
             alert.showAndWait();
             return;
         }
@@ -163,13 +200,25 @@ public class FlightSearchController {
             recentSearches.add(flightSearch);
         }
 
-        ChooseFlight chooseFlight = new ChooseFlight();
-        chooseFlight.setFlightSearch(flightSearch);
-        Stage stage = new Stage();
-        chooseFlight.start(stage);
-
-        System.out.println("Searching flights from " + departure + " to " + destination +
-                " departing on " + depDate + " and returning on " + retDate + " passengers " + passenger);
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/UI/views/choose-flight-view.fxml"));
+            Stage chooseFlightStage = new Stage();
+            chooseFlightStage.setTitle("Chọn chuyến bay");
+            chooseFlightStage.initOwner(searchingStage);
+            chooseFlightStage.initModality(Modality.APPLICATION_MODAL);
+            Scene scene = new Scene(fxmlLoader.load());
+            chooseFlightStage.setScene(scene);
+            
+            ChooseFlightController chooseFlightCtrl = fxmlLoader.getController();
+            chooseFlightCtrl.setFlightSearch(flightSearch);
+            chooseFlightCtrl.setCFStage(chooseFlightStage);
+            chooseFlightCtrl.setCFScene(scene);
+            chooseFlightCtrl.setMode(mode);
+            chooseFlightCtrl.initData();
+            chooseFlightStage.show();
+        } catch(IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -179,8 +228,18 @@ public class FlightSearchController {
             Stage stage = new Stage();
             stage.setTitle("Lịch sử tìm kiếm gần đây");
             stage.setScene(new javafx.scene.Scene(fxmlLoader.load()));
+            stage.initOwner(searchingStage);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+
             RecentSearchHistoryController controller = fxmlLoader.getController();
             controller.setHistoryTable(recentSearches);
+            if (recentSearches.isEmpty()) {
+                TableView<FlightSearch> table = controller.getTable();
+                Label message = new Label("Chưa có chuyến bay nào được tìm kiếm");
+                message.setStyle("-fx-font-size: 16px");
+                table.setPlaceholder(message);
+            }
             stage.show();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -191,6 +250,8 @@ public class FlightSearchController {
         FormCustomer formCustomer = new FormCustomer();
         Stage stage = new Stage();
         formCustomer.setMode(Mode.SHOW);
+        stage.initOwner(searchingStage);
+        stage.initModality(Modality.APPLICATION_MODAL);
         formCustomer.start(stage);
     }
 

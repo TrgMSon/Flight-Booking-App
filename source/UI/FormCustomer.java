@@ -9,27 +9,52 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Control;
 import javafx.stage.Stage;
-import manage.CustomerBusiness;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.DatePicker;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDate;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.geometry.Rectangle2D;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
+
+import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Random;
+import java.util.ArrayList;
+
 import entity.Customer;
+import entity.Booking;
 import UI.Mode.Mode;
+import entity.Flight;
+import entity.BookingDetail;
+import manage.BookingBusiness;
+import manage.CustomerBusiness;
+import manage.FlightTicketBusiness;
 
 public class FormCustomer extends Application {
+    private Stage formCustomerStage, stageBill;
     private Mode mode;
+    private ArrayList<Flight> flights;
+    private int passengers;
+    private Booking booking;
+    private Customer customer;
+    private ArrayList<BookingDetail> bookingDetails;
 
     public void setMode(Mode mode) {
         this.mode = mode;
+    }
+
+    public void setPassengers(int passengers) {
+        this.passengers = passengers;
+    }
+
+    public void setFlights(ArrayList<Flight> flights) {
+        this.flights = new ArrayList<>(flights);
     }
 
     public void start(Stage stage) {
@@ -37,7 +62,10 @@ public class FormCustomer extends Application {
         root.setPadding(new Insets(20));
 
         Label title = new Label("Thông tin khách hàng");
+        title.setStyle("-fx-font-size: 30px");
+
         BorderPane titlePane = new BorderPane();
+        titlePane.setPadding(new Insets(50, 10, 10, 10));
         titlePane.setCenter(title);
         BorderPane.setAlignment(titlePane, Pos.CENTER);
 
@@ -66,10 +94,10 @@ public class FormCustomer extends Application {
 
         Button accept = new Button("Xác nhận");
         initActionAccept(accept, stage, form, mode);
-        Button close = new Button("Đóng");
-        initActionClose(close, stage);
+        Button close = new Button("Quay lại");
+        initActionClose(close, stage, mode);
 
-        buttonBox.getChildren().addAll(accept, close);
+        buttonBox.getChildren().addAll(close, accept);
         form.getChildren().add(buttonBox);
 
         root.setTop(titlePane);
@@ -80,27 +108,15 @@ public class FormCustomer extends Application {
         scene.getStylesheets().add(getClass().getResource("/effect/style.css").toExternalForm());
         stage.setTitle("Nhập thông tin khách hàng");
         stage.setScene(scene);
+        formCustomerStage = stage;
         stage.show();
     }
 
-    public void initInform(String message) {
-        Stage inform = new Stage();
-        inform.setTitle("Thông báo");
-        inform.initModality(Modality.APPLICATION_MODAL);
-
-        BorderPane root = new BorderPane();
-        VBox informBox = new VBox(40);
-        Label informLabel = new Label(message);
-        Button close = new Button("Đóng");
-        initActionClose(close, inform);
-        informBox.setAlignment(Pos.CENTER);
-        informBox.getChildren().addAll(informLabel, close);
-
-        root.setCenter(informBox);
-        Scene scene = new Scene(root, 300, 200);
-        scene.getStylesheets().add(getClass().getResource("/effect/style.css").toExternalForm());
-        inform.setScene(scene);
-        inform.show();
+    public Alert initAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Thông báo");
+        alert.setHeaderText(message);
+        return alert;
     }
 
     public void initActionAccept(Button accept, Stage stage, VBox form, Mode mode) {
@@ -124,9 +140,10 @@ public class FormCustomer extends Application {
                 String mail = ((TextField) box.getChildren().get(1)).getText();
 
                 String customer_id = CustomerBusiness.showCustomerId(mail);
-                Customer customer = new Customer(customer_id, name, dob, phone, mail);
+                customer = new Customer(customer_id, name, dob, phone, mail);
                 if (CustomerBusiness.isValid(customer) == false) {
-                    initInform("Vui lòng nhập đủ thông tin khách hàng");
+                    Alert alert = initAlert("Vui lòng nhập đủ thông tin khách hàng");
+                    alert.showAndWait();
                     return;
                 }
 
@@ -139,27 +156,74 @@ public class FormCustomer extends Application {
                     customer.setCustomerId(customer_id);
                 }
 
-                if (mode == Mode.ADD) {
-                    CustomerBusiness.addCustomer(customer);
-                }
+                if (mode == Mode.SHOW) {
+                    if (CustomerBusiness.isExist(customer) == false) {
+                        Alert alert = initAlert("Thông tin khách hàng không tồn tại");
+                        alert.showAndWait();
+                        return;
+                    }
 
-                else if (mode == Mode.SHOW) {
                     Bill bill = new Bill();
-                    Stage stageBill = new Stage();
-                    bill.setCustomerId(CustomerBusiness.showCustomerId(mail));
+                    bill.setCustomerId(customer_id);
+
+                    stageBill = new Stage();
+                    stageBill.initOwner(formCustomerStage);
+                    stageBill.initModality(Modality.WINDOW_MODAL);
                     bill.start(stageBill);
+
                 }
 
-                stage.close();
+                else {
+                    if (CustomerBusiness.isExist(customer_id) == false) {
+                        CustomerBusiness.addCustomer(customer);
+                    }
+
+                    Random rand = new Random();
+                    String booking_id = "B" + String.format("%04d", rand.nextInt(10000));
+                    while (BookingBusiness.isExist(booking_id)) {
+                        booking_id = "B" + String.format("%04d", rand.nextInt(10000));
+                    }
+                    BigDecimal total = new BigDecimal("0");
+
+                    bookingDetails = new ArrayList<>();
+                    for (Flight flight : flights) {
+                        BookingDetail bookingDetail = new BookingDetail(flight.getFlightId(), booking_id, customer_id,
+                                flight.getFlightNumber(), passengers);
+                        bookingDetails.add(bookingDetail);
+                        BigDecimal price = new BigDecimal(FlightTicketBusiness.getPrice(flight.getFlightId()));
+                        BigDecimal qty = new BigDecimal(passengers);
+                        total = total.add(price.multiply(qty));
+                    }
+
+                    LocalDateTime now = LocalDateTime.now();
+                    DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String formatted = now.format(fmt);
+                    booking = new Booking(booking_id, customer_id, formatted, total);
+
+                    ChooseSeat chooseSeat = new ChooseSeat(booking, customer, bookingDetails);
+                    chooseSeat.setMode(mode);
+                    chooseSeat.setFormCustomerStage(formCustomerStage);
+
+                    Stage chooseSeatStage = new Stage();
+                    chooseSeatStage.initOwner(formCustomerStage);
+                    chooseSeatStage.initModality(Modality.APPLICATION_MODAL);
+                    chooseSeat.start(chooseSeatStage);
+
+                }
+
             }
         });
     }
 
-    public void initActionClose(Button close, Stage stage) {
+    public void initActionClose(Button close, Stage stage, Mode mode) {
         close.setFocusTraversable(false);
         close.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent ae) {
-                stage.close();
+                if (mode == Mode.SHOW) {
+                    stage.close();
+                } else {
+                    stage.hide();
+                }
             }
         });
     }

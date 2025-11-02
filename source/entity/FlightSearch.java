@@ -5,16 +5,26 @@ public class FlightSearch {
     private String destinationCity;
     private String departureDate;
     private String returnDate;
+    private int passenger;
 
     public FlightSearch() {
 
     }
 
-    public FlightSearch(String departureCity, String destinationCity, String departureDate, String returnDate) {
+    public FlightSearch(String departureCity, String destinationCity, String departureDate, String returnDate, int passenger) {
         this.departureCity = departureCity;
         this.destinationCity = destinationCity;
         this.departureDate = departureDate;
         this.returnDate = returnDate;
+        this.passenger = passenger;
+    }
+
+    public int getPassenger() {
+        return passenger;
+    }
+
+    public void setPassenger(int passenger) {
+        this.passenger = passenger;
     }
 
     public String getDepartureCity() {

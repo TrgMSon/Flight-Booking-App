@@ -11,6 +11,33 @@ import Connection.DataConnection;
 import entity.Customer;
 
 public class CustomerBusiness {
+    public static String showCustomerId(String email) {
+        String id = "";
+
+        Connection conn = null;
+        try {
+            conn = DataConnection.setConnect();
+            String sql = "SELECT customer_id FROM customer WHERE email = '" + email + "'";
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery(sql);
+
+            if (rs.next())
+                id = rs.getString("customer_id");
+        } catch (SQLException e) {
+            Logger.getLogger(CustomerBusiness.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Cannot close connection");
+            }
+        }
+
+        return id;
+    }
+
     public static Customer showInfor(String customer_id) {
         Customer customer = new Customer();
 
@@ -71,12 +98,52 @@ public class CustomerBusiness {
         return false;
     }
 
-    public static boolean isExist(String customer_id) {
+    public static boolean isExist(Customer customer) {
         Connection conn = null;
 
         try {
             conn = DataConnection.setConnect();
-            String sql = "SELECT * FROM customer WHERE customer_id = '" + customer_id + "'";
+            String sql = "SELECT * FROM customer WHERE customer_id = '" + customer.getCustomerId() + "'";
+            Statement stm = conn.createStatement();
+            ResultSet rs = stm.executeQuery(sql);
+
+            if (rs.next()) {
+                String phone = rs.getString("phone");
+                String email = rs.getString("email");
+                String dob = rs.getString("dob");
+                if (dob.equals(customer.getDob()) == false || phone.equals(customer.getPhone()) == false
+                        || email.equals(customer.getEmail()) == false)
+                    return false;
+            }
+            else return false;
+
+        } catch (SQLException e) {
+            Logger.getLogger(CustomerBusiness.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Cannot close connection");
+            }
+        }
+
+        return true;
+    }
+
+    public static boolean isExist(String keyword) {
+        Connection conn = null;
+
+        try {
+            String target = "";
+            if (keyword.contains("@"))
+                target = "email";
+            else
+                target = "customer_id";
+
+            conn = DataConnection.setConnect();
+            String sql = "SELECT * FROM customer WHERE " + target + " = '" + keyword + "'";
             Statement stm = conn.createStatement();
             ResultSet rs = stm.executeQuery(sql);
 

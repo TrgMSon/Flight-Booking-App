@@ -2,9 +2,20 @@ package entity;
 public class BookingDetail {
     private String flight_id, booking_id, customer_id, flight_number;
     private int passengers;
+    private String position;
 
     public BookingDetail() {
 
+    }
+
+    public BookingDetail(String flight_id, String booking_id, String customer_id, String flight_number,
+            int passengers, String position) {
+        this.flight_id = flight_id;
+        this.booking_id = booking_id;
+        this.customer_id = customer_id;
+        this.flight_number = flight_number;
+        this.passengers = passengers;
+        this.position = position;
     }
 
     public BookingDetail(String flight_id, String booking_id, String customer_id, String flight_number,
@@ -14,6 +25,14 @@ public class BookingDetail {
         this.customer_id = customer_id;
         this.flight_number = flight_number;
         this.passengers = passengers;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     public String getFlightId() {

@@ -1,6 +1,5 @@
 package UI.Mode;
 
 public enum Mode {
-    SHOW, ADD;
+    SHOW, ROUNDTRIP, ROUNDTRIP2, ONEWAY;
 }
-

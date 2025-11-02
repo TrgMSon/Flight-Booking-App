@@ -1,6 +1,7 @@
 package entity;
 public class Flight {
-    private String flight_id, flight_number, departure_airport_id, arrival_airport_id, departure_time, arrival_time;
+    private String flight_id, flight_number, departure_airport_id, arrival_airport_id;
+    private String departure_time, arrival_time;
 
     public Flight() {
 

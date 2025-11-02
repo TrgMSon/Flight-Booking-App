@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.TableView?>
-
 <?import javafx.scene.control.TableColumn?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="UI.controllers.RecentSearchHistoryController"
-            prefWidth="900" prefHeight="200">
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
 
-    <TableView fx:id="historyTable" layoutX="20" layoutY="20" prefWidth="860" prefHeight="160">
+<AnchorPane prefHeight="200" prefWidth="845.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.RecentSearchHistoryController">
+
+    <TableView fx:id="historyTable" layoutX="20" layoutY="20" prefHeight="160" prefWidth="802.0">
         <columns>
-            <TableColumn fx:id="departureCityColumn" text="Nơi đi" prefWidth="200"/>
-            <TableColumn fx:id="destinationCityColumn" text="Nơi đến" prefWidth="200"/>
-            <TableColumn fx:id="departureDateColumn" text="Ngày đi" prefWidth="200"/>
-            <TableColumn fx:id="returnDateColumn" text="Ngày về" prefWidth="200"/>
+            <TableColumn fx:id="departureCityColumn" prefWidth="200" text="Nơi đi" />
+            <TableColumn fx:id="destinationCityColumn" prefWidth="200" text="Nơi đến" />
+            <TableColumn fx:id="departureDateColumn" prefWidth="200" text="Ngày đi" />
+            <TableColumn fx:id="returnDateColumn" prefWidth="200" text="Ngày về" />
         </columns>
     </TableView>
 </AnchorPane>

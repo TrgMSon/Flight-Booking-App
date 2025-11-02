@@ -1,6 +1,6 @@
 package manage;
+
 import java.sql.Statement;
-// import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import Connection.DataConnection;
 import entity.Flight;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -52,9 +51,14 @@ public class FlightBusiness {
         return ans;
     }
 
+    public static String formatTime(String time) {
+        String[] tmp = time.split(":");
+        return tmp[0] + " giờ " + tmp[1] + " phút";
+    }
+
     public static String getDate(String date) {
         String[] tmp = date.split("\\s+")[0].split("-");
-        String ans = "ngày " + tmp[2] + " tháng " + tmp[1] + " năm " + tmp[0];
+        String ans = "Ngày " + tmp[2] + " tháng " + tmp[1] + " năm " + tmp[0];
         return ans; 
     }
 
@@ -71,5 +75,18 @@ public class FlightBusiness {
                         (Long.parseLong(arv_time.substring(3)) - Long.parseLong(dpt_time.substring(3)));
         
         return time/60 + " giờ " + time%60 + " phút ";
+    }
+
+    public static String getAirportId(String s) {
+        String[] tmp = s.split(" ");
+        String tmp1 = "";
+        for (String i : tmp) {
+            if (i.contains(",")) {
+                tmp1 = i;
+                break;
+            }
+        }
+        int n = tmp1.length();
+        return tmp1.substring(1, n-2);
     }
 }

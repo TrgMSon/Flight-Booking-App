@@ -35,4 +35,8 @@ public class RecentSearchHistoryController {
     public void setHistoryTable(ObservableList<FlightSearch> recentSearches) {
         historyTable.setItems(recentSearches);
     }
+
+    public TableView<FlightSearch> getTable() {
+        return historyTable;
+    }
 }

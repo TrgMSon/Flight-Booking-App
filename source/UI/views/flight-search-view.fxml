@@ -4,50 +4,67 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="flightSearchWindow" prefHeight="265.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.FlightSearchController">
-
-    <!-- Departure and Destination -->
-    <ComboBox fx:id="departurePicker" layoutX="20.0" layoutY="107.0" prefHeight="26.0" prefWidth="210.0" />
-    <ComboBox fx:id="destinationPicker" layoutX="250.0" layoutY="107.0" prefHeight="26.0" prefWidth="210.0" />
-
-
-    <Label layoutX="20.0" layoutY="80.0" text="Từ" />
-    <Label layoutX="250.0" layoutY="80.0" text="Đến" />
-    <Label layoutX="472.0" layoutY="80.0" text="Ngày đi" />
-    <Label layoutX="690.0" layoutY="80.0" text="Ngày về" />
-    
-
-    <!-- Dates -->
-    <DatePicker fx:id="departureDate" layoutX="472.0" layoutY="107.0" />
-    <DatePicker fx:id="returnDate" layoutX="691.0" layoutY="107.0" />
-
-    <!-- Buttons -->
-    <Button fx:id="recentSearchButton" layoutX="14.0" layoutY="14.0" onAction="#handleRecentSearch" text="Tra cứu gần đây">
-      <font>
-         <Font name="System Bold" size="10.0" />
-      </font></Button>
-
-    <Button fx:id="searchButton" layoutX="730.0" layoutY="208.0" onAction="#handleSearch" text="Tìm kiếm">
-      <font>
-         <Font name="System Bold" size="10.0" />
-      </font></Button>
-
-    <Button fx:id="bookingHistory" layoutX="250.0" layoutY="15.0" onAction="#handleBookingHistory" text="Lịch sử giao dịch">
-      <font>
-         <Font name="System Bold" size="10.0" />
-      </font></Button>
-
-    <VBox alignment="CENTER" spacing="10" layoutX="40" layoutY="180">
-        <Label layoutX="50" layoutY="200" text="Hành khách" />
-        <HBox spacing="10" alignment="CENTER">
-            <Button text="-" styleClass="circle-button" onAction="#handleMinus"/>
-            <Label fx:id="passengers" text="1" style="-fx-font-size: 24px;"/>
-            <Button text="+" styleClass="circle-button" onAction="#handlePlus"/>
-        </HBox>
-    </VBox>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.controllers.FlightSearchController">
+   <children>
+      <FlowPane layoutX="-3.0" prefHeight="200.0" prefWidth="1285.0" style="-fx-background-color: white; -fx-font-family: Lucida Sans;" />
+      <AnchorPane id="formSearching" fx:id="flightSearchWindow" layoutX="126.0" layoutY="368.0" prefHeight="431.0" prefWidth="1026.0" style="-fx-background-color: rgb(250, 244, 225); -fx-border-color: rgb(158, 153, 153);" styleClass="style.css">
+         <children>
+            <ComboBox fx:id="departurePicker" focusTraversable="false" layoutX="21.0" layoutY="229.0" prefHeight="26.0" prefWidth="250.0" />
+            <ComboBox fx:id="destinationPicker" focusTraversable="false" layoutX="296.0" layoutY="229.0" prefHeight="26.0" prefWidth="250.0" />
+            <Label layoutX="19.0" layoutY="191.0" text="Từ" />
+            <Label layoutX="296.0" layoutY="192.0" text="Đến" />
+            <Label fx:id="lbDepartureDate" layoutX="579.0" layoutY="191.0" text="Ngày đi" />
+            <Label fx:id="lbReturnDate" layoutX="790.0" layoutY="191.0" text="Ngày về" />
+            <DatePicker fx:id="departureDate" focusTraversable="false" layoutX="579.0" layoutY="230.0" />
+            <DatePicker fx:id="returnDate" focusTraversable="false" layoutX="790.0" layoutY="230.0" />
+            <Button fx:id="recentSearchButton" layoutX="14.0" layoutY="14.0" onAction="#handleRecentSearch" text="Tra cứu gần đây">
+               <font>
+                  <Font name="System Bold" size="10.0" />
+               </font>
+            </Button>
+            <Button fx:id="searchButton" layoutX="790.0" layoutY="326.0" onAction="#handleSearch" text="Tìm kiếm">
+               <font>
+                  <Font name="System Bold" size="10.0" />
+               </font>
+            </Button>
+            <Button fx:id="bookingHistory" layoutX="250.0" layoutY="15.0" onAction="#handleBookingHistory" text="Lịch sử giao dịch">
+               <font>
+                  <Font name="System Bold" size="10.0" />
+               </font>
+            </Button>
+            <VBox alignment="CENTER" layoutX="49.0" layoutY="305.0" spacing="10">
+               <children>
+                  <Label layoutX="50" layoutY="200" text="Hành khách" />
+                  <HBox alignment="CENTER" spacing="10">
+                     <children>
+                        <Button onAction="#handleMinus" styleClass="circle-button" text="-" />
+                        <Label fx:id="passengers" style="-fx-font-size: 24px;" text="1" />
+                        <Button onAction="#handlePlus" styleClass="circle-button" text="+" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <RadioButton fx:id="roundTripOpt" layoutX="26.0" layoutY="135.0" mnemonicParsing="false" onAction="#handleRoundTripOpt" selected="true" text="Khứ hồi" />
+            <RadioButton fx:id="oneWayOpt" layoutX="166.0" layoutY="135.0" mnemonicParsing="false" onAction="#handleOneWayOpt" text="Một chiều" />
+            <Line endX="898.300048828125" endY="7.62939453125E-6" layoutX="127.0" layoutY="99.0" startX="-126.00001525878906" startY="7.62939453125E-6" />
+         </children>
+      </AnchorPane>
+      <Label id="lbHeader2" alignment="CENTER" focusTraversable="false" layoutX="112.0" layoutY="236.0" prefHeight="82.0" prefWidth="175.0" style="-fx-font-size: 30px; -fx-font-weight: bold;" text="Đặt vé" textAlignment="CENTER"> </Label>
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="128.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../resources/flight_icon.jpg" />
+         </image>
+      </ImageView>
+      <Label layoutX="290.0" layoutY="32.0" prefHeight="86.0" prefWidth="318.0" style="-fx-font-size: 40px;" text="Group CAST"> </Label>
+   </children>
 </AnchorPane>
