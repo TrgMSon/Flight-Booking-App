@@ -171,6 +171,7 @@ public class ConfirmFlight extends Application {
                     alert.setContentText("Tổng tiền: " + BookingBusiness.normalizeTotal(String.valueOf(totalPrice.get())) + " VND");
 
                     if (bookingDetails.size() > 0) {
+                        booking.setTotalAmount(new BigDecimal(String.valueOf(totalPrice)));
                         BookingBusiness.add(booking);
                         for (BookingDetail bookingDetail : bookingDetails) {
                             BookingDetailBusiness.add(bookingDetail);
