@@ -108,6 +108,7 @@ public class FormCustomer extends Application {
         scene.getStylesheets().add(getClass().getResource("/effect/style.css").toExternalForm());
         stage.setTitle("Nhập thông tin khách hàng");
         stage.setScene(scene);
+        stage.setResizable(false);
         formCustomerStage = stage;
         stage.show();
     }

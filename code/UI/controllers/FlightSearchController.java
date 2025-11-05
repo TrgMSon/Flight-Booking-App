@@ -206,6 +206,7 @@ public class FlightSearchController {
             chooseFlightStage.setTitle("Chọn chuyến bay");
             chooseFlightStage.initOwner(searchingStage);
             chooseFlightStage.initModality(Modality.APPLICATION_MODAL);
+            chooseFlightStage.setResizable(false);
             Scene scene = new Scene(fxmlLoader.load());
             chooseFlightStage.setScene(scene);
             

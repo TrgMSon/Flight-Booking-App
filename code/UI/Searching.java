@@ -15,7 +15,6 @@ public class Searching extends Application {
         return searchingStage;
     }
 
-    @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/UI/views/flight-search-view.fxml"));
         AnchorPane root = fxmlLoader.load();

@@ -15,6 +15,7 @@ import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 

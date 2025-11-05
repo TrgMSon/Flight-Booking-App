@@ -45,6 +45,7 @@ public class ChooseFlightController {
     private ArrayList<Flight> flights;
     private ObservableList<FlightInfo> flightData = FXCollections.observableArrayList();
     private FlightSearch flightSearch;
+    private String returnDate;
 
     public void setCFStage(Stage chooseFlightStage) {
         this.chooseFlightStage = chooseFlightStage;
@@ -89,20 +90,20 @@ public class ChooseFlightController {
             flightTable.setPlaceholder(message);
         }
 
-        if (mode == Mode.ROUNDTRIP) {
-            mode = Mode.ROUNDTRIP2;
-            loadFlightData();
-            mode = Mode.ROUNDTRIP;
+        // if (mode == Mode.ROUNDTRIP) {
+        // mode = Mode.ROUNDTRIP2;
+        // loadFlightData();
+        // mode = Mode.ROUNDTRIP;
 
-            if (flightData.isEmpty()) {
-                Label message = new Label("Không có chuyến bay nào phù hợp");
-                message.setStyle("-fx-font-size: 16px");
-                flightTable.setPlaceholder(message);
-            }
-            else {
-                loadFlightData();
-            }
-        }
+        // if (flightData.isEmpty()) {
+        // Label message = new Label("Không có chuyến bay nào phù hợp");
+        // message.setStyle("-fx-font-size: 16px");
+        // flightTable.setPlaceholder(message);
+        // }
+        // else {
+        // loadFlightData();
+        // }
+        // }
     }
 
     private Connection getConnection() throws SQLException {
@@ -112,26 +113,48 @@ public class ChooseFlightController {
     public void loadFlightData() {
         flightData.clear();
 
+        String q = """
+                    SELECT
+                        dep.city AS departure_city,
+                        arr.city AS arrival_city,
+                        f.flight_id,
+                        f.departure_time,
+                        f.arrival_time,
+                        t.price,
+                        t.seats_available
+                    FROM flight f
+                    JOIN airport dep ON f.departure_airport_id = dep.airport_id
+                    JOIN airport arr ON f.arrival_airport_id = arr.airport_id
+                    JOIN flightticket t ON f.flight_id = t.flight_id
+                    WHERE dep.airport_id = ?
+                    AND arr.airport_id = ?
+                    AND t.seats_available >= ?
+                    AND f.departure_time LIKE ?
+                    AND IF(CAST(f.departure_time AS DATE) = CAST(? AS DATE), CAST(f.departure_time AS TIME) > CAST(? AS TIME), 
+                                    IF(CAST(f.departure_time AS DATE) > CAST(? AS DATE), TRUE, FALSE))
+                    ORDER BY f.departure_time
+                """;
+
         String query = """
-                           SELECT
-                                   dep.city AS departure_city,
-                                   arr.city AS arrival_city,
-                                   f.flight_id,
-                                   f.departure_time,
-                                   f.arrival_time,
-                                   t.price,
-                                   t.seats_available
-                               FROM flight f
-                               JOIN airport dep ON f.departure_airport_id = dep.airport_id
-                               JOIN airport arr ON f.arrival_airport_id = arr.airport_id
-                               JOIN flightticket t ON f.flight_id = t.flight_id
-                WHERE dep.airport_id = ?
-                AND arr.airport_id = ?
-                AND t.seats_available >= ?
-                AND f.departure_time LIKE ?
-                               AND IF(CAST(f.departure_time AS DATE) = CAST(NOW() AS DATE), CAST(f.departure_time AS TIME) >= CAST(NOW() AS TIME), TRUE)
-                               ORDER BY f.departure_time;
-                           """;
+                SELECT
+                        dep.city AS departure_city,
+                        arr.city AS arrival_city,
+                        f.flight_id,
+                        f.departure_time,
+                        f.arrival_time,
+                        t.price,
+                        t.seats_available
+                    FROM flight f
+                    JOIN airport dep ON f.departure_airport_id = dep.airport_id
+                    JOIN airport arr ON f.arrival_airport_id = arr.airport_id
+                    JOIN flightticket t ON f.flight_id = t.flight_id
+                    WHERE dep.airport_id = ?
+                    AND arr.airport_id = ?
+                    AND t.seats_available >= ?
+                    AND f.departure_time LIKE ?
+                    AND IF(CAST(f.departure_time AS DATE) = CAST(NOW() AS DATE), CAST(f.departure_time AS TIME) >= CAST(NOW() AS TIME), TRUE)
+                    ORDER BY f.departure_time;
+                """;
 
         if (mode == Mode.ROUNDTRIP2) {
             query = """
@@ -151,13 +174,15 @@ public class ChooseFlightController {
                         AND arr.airport_id = ?
                         AND t.seats_available >= ?
                         AND f.departure_time LIKE ?
-                        AND CAST(f.departure_time AS TIME) > CAST(? AS TIME)
+                        AND IF(CAST(f.departure_time AS DATE) = CAST(? AS DATE), CAST(f.departure_time AS TIME) > CAST(? AS TIME), 
+                                        IF(CAST(f.departure_time AS DATE) > CAST(? AS DATE), TRUE, FALSE))
                         ORDER BY f.departure_time
                     """;
         }
 
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+        try {
+            Connection conn = getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setString(1, flightSearch.getDepartureCity());
             stmt.setString(2, flightSearch.getDestinationCity());
@@ -167,7 +192,9 @@ public class ChooseFlightController {
                 stmt.setString(1, flightSearch.getDestinationCity());
                 stmt.setString(2, flightSearch.getDepartureCity());
                 stmt.setString(4, "%" + flightSearch.getReturnDate() + "%");
-                stmt.setString(5, flightSearch.getReturnDate());
+                stmt.setString(5, returnDate);
+                stmt.setString(6, returnDate);
+                stmt.setString(7, returnDate);
             }
             ResultSet rs = stmt.executeQuery();
 
@@ -189,6 +216,23 @@ public class ChooseFlightController {
 
                 FlightInfo tmp = new FlightInfo(flight_id, departure, destination, depTime, arrTime, duration, price,
                         seats);
+
+                if (mode == Mode.ROUNDTRIP) {
+                    returnDate = arrTime;
+                    PreparedStatement stmt1 = conn.prepareStatement(q);
+                    stmt1.setString(1, flightSearch.getDestinationCity());
+                    stmt1.setString(2, flightSearch.getDepartureCity());
+                    stmt1.setInt(3, flightSearch.getPassenger());
+                    stmt1.setString(4, "%" + flightSearch.getReturnDate() + "%");
+                    stmt1.setString(5, returnDate);
+                    stmt1.setString(6, returnDate);
+                    stmt1.setString(7, returnDate);
+
+                    ResultSet rs1 = stmt1.executeQuery();
+                    if (!rs1.next())
+                        continue;
+                }
+
                 flightData.add(tmp);
             }
 
@@ -237,15 +281,16 @@ public class ChooseFlightController {
                             alert.setTitle("Chọn chuyến bay");
                             alert.setHeaderText(null);
                             alert.setContentText("Bạn có muốn chọn chuyến bay:\n" +
-                                            data.getDeparture() + " → " + data.getDestination() + "\n" +
-                                            "Giờ đi: " + data.getDepartureTime() + "\n" +
-                                            "Giờ đến: " + data.getArrivalTime() + "\n" +
-                                            "Giá vé: " + BookingBusiness.normalizeTotal(String.valueOf(data.getPrice()))
-                                            + " VND\n" +
-                                            "Ghế trống: " + data.getSeats());
+                                    data.getDeparture() + " → " + data.getDestination() + "\n" +
+                                    "Giờ đi: " + data.getDepartureTime() + "\n" +
+                                    "Giờ đến: " + data.getArrivalTime() + "\n" +
+                                    "Giá vé: " + BookingBusiness.normalizeTotal(String.valueOf(data.getPrice()))
+                                    + " VND\n" +
+                                    "Ghế trống: " + data.getSeats());
 
                             DialogPane dialogPane = alert.getDialogPane();
-                            dialogPane.getStylesheets().add(getClass().getResource("/effect/style.css").toExternalForm());
+                            dialogPane.getStylesheets()
+                                    .add(getClass().getResource("/effect/style.css").toExternalForm());
 
                             ButtonType acptBt = new ButtonType("Xác nhận");
                             ButtonType cancelBt = new ButtonType("Hủy");
@@ -253,15 +298,18 @@ public class ChooseFlightController {
                             alert.getButtonTypes().addAll(cancelBt, acptBt);
 
                             alert.getDialogPane().lookupButton(acptBt).setFocusTraversable(false);
-                            alert.getDialogPane().lookupButton(acptBt).setStyle("-fx-pref-width: 120px; -fx-pref-height: 36px");
+                            alert.getDialogPane().lookupButton(acptBt)
+                                    .setStyle("-fx-pref-width: 120px; -fx-pref-height: 36px");
                             alert.getDialogPane().lookupButton(cancelBt).setFocusTraversable(false);
-                            alert.getDialogPane().lookupButton(cancelBt).setStyle("-fx-pref-width: 120px; -fx-pref-height: 36px");
+                            alert.getDialogPane().lookupButton(cancelBt)
+                                    .setStyle("-fx-pref-width: 120px; -fx-pref-height: 36px");
 
                             Optional<ButtonType> option = alert.showAndWait();
                             if (option.get() == acptBt) {
                                 if (mode == Mode.ROUNDTRIP) {
                                     chooseFlightStage.hide();
                                     mode = Mode.ROUNDTRIP2;
+                                    returnDate = data.getArrivalTime();
                                     chooseFlightStage2 = new Stage();
                                     chooseFlightStage2 = chooseFlightStage;
                                     chooseFlightStage2.setScene(chooseFLightScene);
